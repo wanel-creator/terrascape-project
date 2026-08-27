@@ -6,13 +6,14 @@
         <title>Create an account</title>
         <link rel="stylesheet" href="./src/output.css">
     </head>
-    <body class="min-h-screen bg-orange-50 text-gray-800">
-         <nav class="flex flex-wrap items-center gap-6 border border-orange-400 bg-orange-300 p-5 text-lg font-bold md:gap-10">
-            <a class="hover:text-orange-900" href="projects.html">home</a>
+    <body class="min-h-screen bg-orange-50 p-5 text-gray-800">
+                <nav class="flex flex-wrap items-center gap-6 border border-orange-400 bg-orange-300 p-5 text-lg font-bold md:gap-10">
+            <a class="hover:text-orange-900" href="index.html">home</a>
             <a class="hover:text-orange-900" href="about.html">about</a>
             <a class="hover:text-orange-900" href="contacts.html">contacts</a>
-            <a class="rounded border border-orange-700 bg-orange-400 px-4 py-2 text-sm hover:bg-orange-500" href="login form.html">log in</a>
-            <a class="rounded border border-orange-700 bg-orange-400 px-4 py-2 text-sm hover:bg-orange-500" href="registration form.html">register</a>
+            <button id="openMoreButton" class="rounded px-4 py-2 hover:bg-orange-400 hover:text-orange-900" type="button" aria-haspopup="dialog" aria-controls="moreOverlay">more</button>
+            <a class="rounded border border-orange-700 bg-orange-400 px-4 py-2 text-base hover:bg-orange-500" href="loginform.html">log in</a>
+            <a class="rounded border border-orange-700 bg-orange-400 px-4 py-2 text-base hover:bg-orange-500" href="registrationform.html">register</a>
         </nav>
         <main class="mx-auto flex w-full max-w-md items-center px-5 py-12">
             <form id="registrationForm" class="w-full rounded-lg border border-orange-400 bg-white p-8 shadow-lg" novalidate>
