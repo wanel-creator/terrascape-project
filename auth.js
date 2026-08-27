@@ -89,11 +89,13 @@ const registrationForm = document.querySelector('#registrationForm');
 if (registrationForm) {
     const roleSelect = document.querySelector('#registerRole');
     const agentFields = document.querySelector('#agentFields');
-    roleSelect.addEventListener('change', () => {
+    const updateAgentFields = () => {
         agentFields.hidden = roleSelect.value !== 'agent';
         document.querySelector('#agentService').required = roleSelect.value === 'agent';
         document.querySelector('#agentLocation').required = roleSelect.value === 'agent';
-    });
+    };
+    roleSelect.addEventListener('change', updateAgentFields);
+    updateAgentFields();
 
     registrationForm.addEventListener('submit', async (event) => {
         event.preventDefault();
