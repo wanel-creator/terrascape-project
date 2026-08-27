@@ -21,8 +21,25 @@ const isEmailRateLimited = (error) => {
 
 const emailTimeoutMessage = 'Supabase timed out while sending the email. Check your inbox and spam folder before trying again. If no email arrives, wait a few minutes and click Resend code.';
 const emailRateLimitMessage = 'Too many confirmation emails were requested. Wait a while before trying again, then use Resend code once.';
+const resendCooldownSeconds = 60;
 
 const getRegistrationData = () => JSON.parse(localStorage.getItem('pendingRegistration') || 'null');
+
+const startResendCooldown = (button) => {
+    let secondsRemaining = resendCooldownSeconds;
+    button.disabled = true;
+    button.textContent = `Resend code (${secondsRemaining}s)`;
+    const timer = window.setInterval(() => {
+        secondsRemaining -= 1;
+        if (secondsRemaining <= 0) {
+            window.clearInterval(timer);
+            button.disabled = false;
+            button.textContent = 'Resend code';
+            return;
+        }
+        button.textContent = `Resend code (${secondsRemaining}s)`;
+    }, 1000);
+};
 
 const getProfile = async (userId) => {
     const { data, error } = await supabase.from('profiles').select('full_name, role').eq('id', userId).single();
@@ -110,7 +127,7 @@ if (registrationForm) {
                     ? emailRateLimitMessage
                     : isEmailTimeout(error) ? emailTimeoutMessage : error.message;
                 setMessage(message, userMessage, true);
-                if (isEmailTimeout(error)) {
+                if (isEmailTimeout(error) || isEmailRateLimited(error)) {
                     document.querySelector('#verificationStep').hidden = false;
                 }
                 button.disabled = false;
@@ -134,7 +151,7 @@ if (registrationForm) {
                 : isEmailRateLimited(error) ? emailRateLimitMessage
                 : errorMessage || 'Unable to contact Supabase. Check your internet connection and try again.';
             setMessage(message, userMessage, true);
-            if (isEmailTimeout(error)) {
+            if (isEmailTimeout(error) || isEmailRateLimited(error)) {
                 document.querySelector('#verificationStep').hidden = false;
             }
             button.disabled = false;
@@ -193,10 +210,12 @@ if (verifyForm) {
     document.querySelector('#resendCodeButton').addEventListener('click', async () => {
         const pending = getRegistrationData();
         const message = document.querySelector('#registrationMessage');
+        const resendButton = document.querySelector('#resendCodeButton');
         if (!pending?.email) {
             setMessage(message, 'Register again to request a new code.', true);
             return;
         }
+        startResendCooldown(resendButton);
         try {
             const { error } = await supabase.auth.resend({ type: 'signup', email: pending.email });
             const userMessage = error
