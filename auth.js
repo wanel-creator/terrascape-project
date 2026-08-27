@@ -55,28 +55,33 @@ if (loginForm) {
         button.disabled = true;
         setMessage(message, 'Signing you in...');
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: document.querySelector('#loginEmail').value.trim(),
-            password: document.querySelector('#loginPassword').value
-        });
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: document.querySelector('#loginEmail').value.trim(),
+                password: document.querySelector('#loginPassword').value
+            });
 
-        if (error) {
-            setMessage(message, error.message, true);
+            if (error) {
+                setMessage(message, error.message, true);
+                button.disabled = false;
+                return;
+            }
+
+            const { profile, error: profileError } = await getProfile(data.user.id);
+            const selectedRole = document.querySelector('#loginRole').value;
+            if (profileError || !profile || profile.role !== selectedRole) {
+                await supabase.auth.signOut();
+                setMessage(message, `This account is not registered as a ${selectedRole}.`, true);
+                button.disabled = false;
+                return;
+            }
+
+            setMessage(message, `Welcome, ${profile.full_name}.`);
+            window.location.href = selectedRole === 'agent' ? 'agent-dashboard.html' : 'agent-request.html';
+        } catch (error) {
+            setMessage(message, error.message || 'Unable to contact Supabase. Try again shortly.', true);
             button.disabled = false;
-            return;
         }
-
-        const { profile, error: profileError } = await getProfile(data.user.id);
-        const selectedRole = document.querySelector('#loginRole').value;
-        if (profileError || !profile || profile.role !== selectedRole) {
-            await supabase.auth.signOut();
-            setMessage(message, `This account is not registered as a ${selectedRole}.`, true);
-            button.disabled = false;
-            return;
-        }
-
-        setMessage(message, `Welcome, ${profile.full_name}.`);
-        window.location.href = selectedRole === 'agent' ? 'agent-dashboard.html' : 'agent-request.html';
     });
 }
 
@@ -109,14 +114,6 @@ if (registrationForm) {
             bio: document.querySelector('#agentBio')?.value.trim()
         };
         localStorage.setItem('pendingRegistration', JSON.stringify(registrationData));
-
-    registrationForm.addEventListener('invalid', (event) => {
-        event.preventDefault();
-        const field = event.target;
-        const message = document.querySelector('#registrationMessage');
-        setMessage(message, field.validationMessage, true);
-        field.focus();
-    }, true);
 
         try {
             const { data, error } = await supabase.auth.signUp({
@@ -166,6 +163,14 @@ if (registrationForm) {
             button.disabled = false;
         }
     });
+
+    registrationForm.addEventListener('invalid', (event) => {
+        event.preventDefault();
+        const field = event.target;
+        const message = document.querySelector('#registrationMessage');
+        setMessage(message, field.validationMessage, true);
+        field.focus();
+    }, true);
 }
 
 const verifyForm = document.querySelector('#verificationForm');
