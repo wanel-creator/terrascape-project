@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Log in</title>
+        <link rel="stylesheet" href="./src/output.css">
+    </head>
+    <body class="min-h-screen bg-orange-50 text-gray-800">
+             <nav class="flex flex-wrap items-center gap-6 border border-orange-400 bg-orange-300 p-5 text-lg font-bold md:gap-10">
+            <a class="hover:text-orange-900" href="projects.html">home</a>
+            <a class="hover:text-orange-900" href="about.html">about</a>
+            <a class="hover:text-orange-900" href="contacts.html">contacts</a>
+            <a class="rounded border border-orange-700 bg-orange-400 px-4 py-2 text-sm hover:bg-orange-500" href="login form.html">log in</a>
+            <a class="rounded border border-orange-700 bg-orange-400 px-4 py-2 text-sm hover:bg-orange-500" href="registration form.html">register</a>
+        </nav>
+        <main class="mx-auto flex min-h-[calc(100vh-88px)] w-full max-w-md items-center px-5 py-12">
+            <form id="loginForm" class="w-full rounded-lg border border-orange-400 bg-white p-8 shadow-lg" novalidate>
+                <h1 class="text-3xl font-bold text-orange-900">Welcome back</h1>
+                <p class="mt-2 text-gray-600">Log in to manage your services.</p>
+                <div class="mt-6">
+                    <label class="font-semibold" for="loginEmail">Email address</label>
+                    <input class="mt-2 w-full rounded border border-gray-300 p-3 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200" type="email" id="loginEmail" autocomplete="email" required>
+                </div>
+                <div class="mt-4">
+                    <label class="font-semibold" for="loginRole">I am a</label>
+                    <select class="mt-2 w-full rounded border border-gray-300 bg-white p-3 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200" id="loginRole" required>
+                        <option value="user">User looking for a service</option>
+                        <option value="agent">Service agent</option>
+                    </select>
+                </div>
+                <div class="mt-4">
+                    <label class="font-semibold" for="loginPassword">Password</label>
+                    <input class="mt-2 w-full rounded border border-gray-300 p-3 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200" type="password" id="loginPassword" autocomplete="current-password" required>
+                </div>
+                <p id="loginMessage" class="mt-4 min-h-6 text-sm" role="status"></p>
+                <button class="mt-2 w-full rounded bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60" type="submit">Log in</button>
+                <p class="mt-5 text-center text-sm text-gray-600">New here? <a class="font-semibold text-orange-700 hover:text-orange-900" href="registration form.html">Create an account</a></p>
+            </form>
+        </main>
+        <script type="module" src="./auth.js"></script>
+    </body>
+</html>

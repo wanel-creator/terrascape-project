@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme {
+	--animate-slide: slide 10s linear infinite;
+}
+
+@keyframes slide {
+	0% { transform: translateX(0); }
+	33% { transform: translateX(-100%); }
+	66% { transform: translateX(-200%); }
+	100% { transform: translateX(-300%); }
+}

@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <title><b>surveying services</b></title>
+        <link rel="stylesheet" href="./src/output.css">
+        <style>
+            [hidden] { display: none; }
+            .more-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 50;
+                display: grid;
+                place-items: center;
+                background: rgb(0 0 0 / 0.55);
+                padding: 1.25rem;
+            }
+            .more-panel {
+                width: min(100%, 24rem);
+                border-radius: 0.5rem;
+                background: #fff7ed;
+                padding: 1.5rem;
+                box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.2);
+            }
+            .more-panel a {
+                display: block;
+                padding: 0.75rem;
+            }
+            .more-panel a:hover { background: #fed7aa; }
+        </style>
+    </head>
+    <body class="min-h-screen bg-orange-50 p-5 text-gray-800">
+        <nav class="flex flex-wrap items-center gap-6 border border-orange-400 bg-orange-300 p-5 text-lg font-bold md:gap-10">
+            <a class="hover:text-orange-900" href="projects.html">home</a>
+            <a class="hover:text-orange-900" href="about.html">about</a>
+            <a class="hover:text-orange-900" href="contacts.html">contacts</a>
+            <button id="openMoreButton" class="rounded px-4 py-2 hover:bg-orange-400 hover:text-orange-900" type="button" aria-haspopup="dialog" aria-controls="moreOverlay">more</button>
+            <a class="rounded border border-orange-700 bg-orange-400 px-4 py-2 text-base hover:bg-orange-500" href="login form.html">log in</a>
+            <a class="rounded border border-orange-700 bg-orange-400 px-4 py-2 text-base hover:bg-orange-500" href="registration form.html">register</a>
+        </nav>
+        <div id="moreOverlay" class="more-overlay" role="dialog" aria-modal="true" aria-labelledby="moreTitle" hidden>
+            <div class="more-panel">
+                <div class="flex items-center justify-between">
+                    <h2 id="moreTitle" class="text-xl font-bold">More</h2>
+                    <button id="closeMoreButton" class="rounded px-3 py-1 text-2xl hover:bg-orange-200" type="button" aria-label="Close menu">&times;</button>
+                </div>
+                <div class="mt-4">
+                    <a href="agent-request.html">Book a service</a>
+                    <a href="projects.html">Our services</a>
+                    <a href="contacts.html">Help and contact</a>
+                </div>
+            </div>
+        </div>
+        <main class="mx-auto mt-8 grid max-w-6xl gap-6 md:grid-cols-3">
+            <div class="rounded border border-orange-400 bg-white p-6 shadow-md">
+            <h1 class="mb-3 text-2xl font-bold underline">house hunting</h1>
+<p class="leading-relaxed text-gray-600">This helps people find their dream homes within their budget and preferences.Moreover,this means a person doesn't have to spend a lot of time searching for a suitable home or going to the actual location.</p>
+            </div>
+            <div class="rounded border border-orange-400 bg-white p-6 shadow-md">
+                <h1 class="mb-3 text-2xl font-bold underline">land surveying</h1>
+                <p class="leading-relaxed text-gray-600">Land surveying is the process of determining the terrestrial or three-dimensional position of points.Through this app you can easily send a surveyor to your location to measure and map the land, ensuring accurate property boundaries and legal documentation.</p>
+            </div>
+            <div class="rounded border border-orange-400 bg-white p-6 shadow-md">
+                <h1 class="mb-3 text-2xl font-bold underline">property valuation</h1>
+                <p class="leading-relaxed text-gray-600">Property valuation is the process of determining the economic value of a property. Our app provides accurate and up-to-date property valuations to help you make informed decisions about buying, selling, or investing in real estate.</p>
+            </div>
+        </main>
+        <div class="mx-auto mt-8 w-full max-w-3xl overflow-hidden">
+            <div class="flex animate-[slide_10s_linear_infinite]">
+                <img class="w-full shrink-0 object-cover" src="./assets/OIP (3).jpg" alt="surveying services" width="600" height="350">
+                <img class="w-full shrink-0 object-cover" src="./assets/OIP (4).jpg" alt="surveying services" width="600" height="350">
+                <img class="w-full shrink-0 object-cover" src="./assets/OIP (3).webp" alt="surveying services" width="600" height="350">
+            </div>
+        </div>
+        <footer class="mt-12 border-t border-orange-400 bg-orange-300 px-6 py-8 text-orange-950">
+            <div class="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h2 class="text-xl font-bold">Terrascope</h2>
+                    <p class="mt-1 text-sm">Reliable property services, wherever you are.</p>
+                </div>
+                <div class="flex flex-col gap-3 text-sm md:items-end mx-auto">
+                    <a class="font-semibold hover:text-orange-700" href="contacts.html">Contact us</a>
+                    <a class="hover:text-orange-700" href="https://wa.me/254791900858">WhatsApp: 0791 900 858</a>
+                    <a class="hover:text-orange-700" href="https://Terrascope@gmail.com">Gmail:Terrascope@gmail.com</a>
+                    <a class="hover:text-orange-700" href="https://www.instagram.com/">Instagram: @terrascope</a>
+                </div>
+            </div>
+            <p class="mx-auto mt-6 max-w-6xl border-t border-orange-400 pt-4 text-center text-xs">&copy; 2026 Terrascope. All rights reserved.</p>
+        </footer>
+        <script src="./interaction.js"></script>
+    </body>
+</html>
