@@ -94,6 +94,7 @@ if (registrationForm) {
         event.preventDefault();
         const button = registrationForm.querySelector('button[type="submit"]');
         const message = document.querySelector('#registrationMessage');
+        button.hidden = false;
         button.disabled = true;
         setMessage(message, 'Creating your account...');
 
@@ -108,6 +109,14 @@ if (registrationForm) {
             bio: document.querySelector('#agentBio')?.value.trim()
         };
         localStorage.setItem('pendingRegistration', JSON.stringify(registrationData));
+
+    registrationForm.addEventListener('invalid', (event) => {
+        event.preventDefault();
+        const field = event.target;
+        const message = document.querySelector('#registrationMessage');
+        setMessage(message, field.validationMessage, true);
+        field.focus();
+    }, true);
 
         try {
             const { data, error } = await supabase.auth.signUp({
