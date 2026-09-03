@@ -6,45 +6,34 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const setMessage = (element, message, isError = false) => {
     element.textContent = message;
-    element.className = `mt-4 min-h-6 text-sm ${isError ? 'text-red-600' : 'text-green-700'}`;
+    element.className = `mt-4 min-h-6 rounded border px-3 py-2 text-sm ${isError ? 'border-red-200 bg-red-50 text-red-700' : 'border-orange-200 bg-orange-100 text-orange-800'}`;
 };
 
-const isEmailTimeout = (error) => {
-    const details = `${error?.status || ''} ${error?.message || error || ''}`.toLowerCase();
-    return details.includes('504') || details.includes('gateway timeout');
-};
+const redirectAuthenticatedUser = async () => {
+    const page = window.location.pathname.split('/').pop();
+    if (!['loginform.html', 'registrationform.html', 'supabase-confirmation-email.html'].includes(page)) {
+        return;
+    }
 
-const isEmailRateLimited = (error) => {
-    const details = `${error?.status || ''} ${error?.message || error || ''}`.toLowerCase();
-    return details.includes('429') || details.includes('rate limit') || details.includes('too many requests');
-};
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+        return;
+    }
 
-const emailTimeoutMessage = 'Supabase timed out while sending the email. Check your inbox and spam folder before trying again. If no email arrives, wait a few minutes and click Resend code.';
-const emailRateLimitMessage = 'Too many confirmation emails were requested. Wait a while before trying again, then use Resend code once.';
-const resendCooldownSeconds = 60;
+    const { data: profile, error: profileError } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    if (profileError || !profile) {
+        return;
+    }
 
-const getRegistrationData = () => JSON.parse(localStorage.getItem('pendingRegistration') || 'null');
-
-const startResendCooldown = (button) => {
-    let secondsRemaining = resendCooldownSeconds;
-    button.disabled = true;
-    button.textContent = `Resend code (${secondsRemaining}s)`;
-    const timer = window.setInterval(() => {
-        secondsRemaining -= 1;
-        if (secondsRemaining <= 0) {
-            window.clearInterval(timer);
-            button.disabled = false;
-            button.textContent = 'Resend code';
-            return;
-        }
-        button.textContent = `Resend code (${secondsRemaining}s)`;
-    }, 1000);
+    window.location.href = profile.role === 'agent' ? 'agent-dashboard.html' : 'agent-request.html';
 };
 
 const getProfile = async (userId) => {
     const { data, error } = await supabase.from('profiles').select('full_name, role').eq('id', userId).single();
     return { profile: data, error };
 };
+
+redirectAuthenticatedUser();
 
 const loginForm = document.querySelector('#loginForm');
 if (loginForm) {
@@ -87,18 +76,9 @@ if (loginForm) {
 
 const registrationForm = document.querySelector('#registrationForm');
 if (registrationForm) {
+    registrationForm.setAttribute('novalidate', 'novalidate');
     const roleSelect = document.querySelector('#registerRole');
     const agentFields = document.querySelector('#agentFields');
-    const verificationStep = document.querySelector('#verificationStep');
-    const verificationCode = document.querySelector('#verificationCode');
-    const setVerificationStep = (visible) => {
-        verificationStep.hidden = !visible;
-        verificationCode.disabled = !visible;
-        verificationCode.required = visible;
-        if (!visible) {
-            verificationCode.value = '';
-        }
-    };
     const updateAgentFields = () => {
         agentFields.hidden = roleSelect.value !== 'agent';
         document.querySelector('#agentService').required = roleSelect.value === 'agent';
@@ -106,7 +86,6 @@ if (registrationForm) {
     };
     roleSelect.addEventListener('change', updateAgentFields);
     updateAgentFields();
-    setVerificationStep(false);
 
     registrationForm.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -126,8 +105,6 @@ if (registrationForm) {
             location: document.querySelector('#agentLocation')?.value.trim(),
             bio: document.querySelector('#agentBio')?.value.trim()
         };
-        localStorage.setItem('pendingRegistration', JSON.stringify(registrationData));
-
         try {
             const { data, error } = await supabase.auth.signUp({
                 email: registrationData.email,
@@ -142,37 +119,21 @@ if (registrationForm) {
             });
 
             if (error) {
-                const userMessage = isEmailRateLimited(error)
-                    ? emailRateLimitMessage
-                    : isEmailTimeout(error) ? emailTimeoutMessage : error.message;
-                setMessage(message, userMessage, true);
-                if (isEmailTimeout(error) || isEmailRateLimited(error)) {
-                    document.querySelector('#verificationStep').hidden = false;
-                }
+                setMessage(message, error.message, true);
                 button.disabled = false;
                 return;
             }
 
             if (data.session) {
-                setVerificationStep(false);
                 setMessage(message, 'Account created, but email confirmation is disabled in Supabase. Enable Confirm email in Authentication settings to send OTP codes.', true);
                 button.hidden = true;
                 return;
             }
 
-            setVerificationStep(true);
-            setMessage(message, 'Check your email and spam folder for the confirmation code, then enter it below.');
+            setMessage(message, 'Your account was created. Check your email and follow the confirmation link to finish signing in.');
             button.hidden = true;
         } catch (error) {
-            const errorMessage = error.message || '';
-            const userMessage = isEmailTimeout(error)
-                ? emailTimeoutMessage
-                : isEmailRateLimited(error) ? emailRateLimitMessage
-                : errorMessage || 'Unable to contact Supabase. Check your internet connection and try again.';
-            setMessage(message, userMessage, true);
-            if (isEmailTimeout(error) || isEmailRateLimited(error)) {
-                setVerificationStep(true);
-            }
+            setMessage(message, error.message || 'Unable to contact Supabase. Check your internet connection and try again.', true);
             button.disabled = false;
         }
     });
@@ -184,77 +145,4 @@ if (registrationForm) {
         setMessage(message, field.validationMessage, true);
         field.focus();
     }, true);
-}
-
-const verifyForm = document.querySelector('#verificationForm');
-if (verifyForm) {
-    const verifyButton = verifyForm.querySelector('button[type="button"]');
-    verifyButton.addEventListener('click', async () => {
-        const button = verifyButton;
-        const message = document.querySelector('#registrationMessage');
-        const pending = getRegistrationData();
-        const code = document.querySelector('#verificationCode').value.trim();
-        if (!pending || !code) {
-            setMessage(message, 'Enter the code sent to your email.', true);
-            return;
-        }
-        button.disabled = true;
-        setMessage(message, 'Verifying your code...');
-
-        const { data, error } = await supabase.auth.verifyOtp({
-            email: pending?.email,
-            token: document.querySelector('#verificationCode').value.trim(),
-            type: 'signup'
-        });
-
-        if (error || !pending || !data.user) {
-            setMessage(message, error?.message || 'Your registration details have expired. Please register again.', true);
-            button.disabled = false;
-            return;
-        }
-
-        if (pending.role === 'agent') {
-            const { error: agentError } = await supabase.from('agent_profiles').upsert({
-                id: data.user.id,
-                service: pending.service,
-                location: pending.location,
-                bio: pending.bio
-            });
-            if (agentError) {
-                setMessage(message, agentError.message, true);
-                button.disabled = false;
-                return;
-            }
-        }
-
-        localStorage.removeItem('pendingRegistration');
-        setMessage(message, 'Email confirmed. You can now log in.');
-        document.querySelector('#verificationCode').value = '';
-        setVerificationStep(false);
-        document.querySelector('#registrationForm').reset();
-        button.hidden = true;
-    });
-
-    document.querySelector('#resendCodeButton').addEventListener('click', async () => {
-        const pending = getRegistrationData();
-        const message = document.querySelector('#registrationMessage');
-        const resendButton = document.querySelector('#resendCodeButton');
-        if (!pending?.email) {
-            setMessage(message, 'Register again to request a new code.', true);
-            return;
-        }
-        startResendCooldown(resendButton);
-        try {
-            const { error } = await supabase.auth.resend({ type: 'signup', email: pending.email });
-            const userMessage = error
-                ? isEmailRateLimited(error) ? emailRateLimitMessage : error.message
-                : 'A new confirmation code has been sent.';
-            setMessage(message, userMessage, Boolean(error));
-        } catch (error) {
-            const userMessage = isEmailRateLimited(error)
-                ? emailRateLimitMessage
-                : error.message || 'Unable to resend the confirmation code. Try again shortly.';
-            setMessage(message, userMessage, true);
-        }
-    });
 }

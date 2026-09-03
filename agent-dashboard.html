@@ -16,6 +16,44 @@
         <p id="agentGreeting" class="text-sm font-semibold uppercase tracking-widest text-orange-700"></p>
         <h1 class="mt-2 text-3xl font-bold text-orange-900">Available service requests</h1>
         <p id="agentService" class="mt-2 text-gray-600"></p>
+
+        <form id="agentProfileForm" class="mt-8 rounded-lg border border-orange-200 bg-white p-6 shadow-md">
+            <h2 class="text-2xl font-bold text-orange-900">Complete your agent profile</h2>
+            <p class="mt-2 text-sm text-gray-600">Add your service details so clients can find you and receive requests.</p>
+
+            <div class="mt-5">
+                <label class="font-semibold" for="profileService">Service you provide</label>
+                <select id="profileService" class="mt-2 w-full rounded border border-gray-300 bg-white p-3" required>
+                    <option value="house hunting">House hunting</option>
+                    <option value="land surveying">Land surveying</option>
+                    <option value="property valuation">Property valuation</option>
+                </select>
+            </div>
+
+            <div class="mt-4">
+                <label class="font-semibold" for="profileLocation">Service location</label>
+                <input id="profileLocation" class="mt-2 w-full rounded border border-gray-300 p-3" type="text" required>
+            </div>
+
+            <div class="mt-4">
+                <label class="font-semibold" for="profilePhone">Phone number clients can call</label>
+                <input id="profilePhone" class="mt-2 w-full rounded border border-gray-300 p-3" type="tel" required>
+            </div>
+
+            <div class="mt-4">
+                <label class="font-semibold" for="profileBio">Short professional description</label>
+                <textarea id="profileBio" class="mt-2 w-full rounded border border-gray-300 p-3" rows="3"></textarea>
+            </div>
+
+            <div class="mt-4 flex items-center gap-3">
+                <input id="profileAvailable" type="checkbox" checked>
+                <label for="profileAvailable" class="font-medium text-gray-700">Available for requests</label>
+            </div>
+
+            <button type="submit" class="mt-5 rounded bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600">Save profile</button>
+            <p id="agentProfileMessage" class="mt-4 min-h-6 text-sm" role="status"></p>
+        </form>
+
         <div id="agentRequestList" class="mt-8 grid gap-5 md:grid-cols-2"></div>
     </main>
     <script type="module" src="./js%20files/app.js"></script>
