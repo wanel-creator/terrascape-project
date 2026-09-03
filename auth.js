@@ -89,6 +89,16 @@ const registrationForm = document.querySelector('#registrationForm');
 if (registrationForm) {
     const roleSelect = document.querySelector('#registerRole');
     const agentFields = document.querySelector('#agentFields');
+    const verificationStep = document.querySelector('#verificationStep');
+    const verificationCode = document.querySelector('#verificationCode');
+    const setVerificationStep = (visible) => {
+        verificationStep.hidden = !visible;
+        verificationCode.disabled = !visible;
+        verificationCode.required = visible;
+        if (!visible) {
+            verificationCode.value = '';
+        }
+    };
     const updateAgentFields = () => {
         agentFields.hidden = roleSelect.value !== 'agent';
         document.querySelector('#agentService').required = roleSelect.value === 'agent';
@@ -96,6 +106,7 @@ if (registrationForm) {
     };
     roleSelect.addEventListener('change', updateAgentFields);
     updateAgentFields();
+    setVerificationStep(false);
 
     registrationForm.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -143,13 +154,13 @@ if (registrationForm) {
             }
 
             if (data.session) {
-                document.querySelector('#verificationStep').hidden = true;
+                setVerificationStep(false);
                 setMessage(message, 'Account created, but email confirmation is disabled in Supabase. Enable Confirm email in Authentication settings to send OTP codes.', true);
                 button.hidden = true;
                 return;
             }
 
-            document.querySelector('#verificationStep').hidden = false;
+            setVerificationStep(true);
             setMessage(message, 'Check your email and spam folder for the confirmation code, then enter it below.');
             button.hidden = true;
         } catch (error) {
@@ -160,7 +171,7 @@ if (registrationForm) {
                 : errorMessage || 'Unable to contact Supabase. Check your internet connection and try again.';
             setMessage(message, userMessage, true);
             if (isEmailTimeout(error) || isEmailRateLimited(error)) {
-                document.querySelector('#verificationStep').hidden = false;
+                setVerificationStep(true);
             }
             button.disabled = false;
         }
@@ -219,6 +230,7 @@ if (verifyForm) {
         localStorage.removeItem('pendingRegistration');
         setMessage(message, 'Email confirmed. You can now log in.');
         document.querySelector('#verificationCode').value = '';
+        setVerificationStep(false);
         document.querySelector('#registrationForm').reset();
         button.hidden = true;
     });
